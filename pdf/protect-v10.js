@@ -12,14 +12,29 @@ async function engine(){
   for(const base of SOURCES){
    try{
     const mod=await import(base+'qpdf.js');
-    const factory=mod.default||mod.createModule||mod.Module||mod.createQPDFModule;
-    if(typeof factory!=='function'){
-      failures.push(new URL(base).hostname+': exportaciones disponibles '+Object.keys(mod).join(', '));
+    // Los paquetes Emscripten pueden exportar el inicializador con distintos nombres.
+    // Inspeccionamos las exportaciones y sus propiedades, sin asumir que default es una función.
+    const candidates=[mod.default,mod.createModule,mod.Module,mod.createQPDFModule,
+      mod.createQpdfModule,mod.QPDF,mod.QPDFModule,
+      ...Object.values(mod)].filter(Boolean);
+    let q=null;const attempts=[];
+    for(const candidate of candidates){
+      try{
+        const factory=typeof candidate==='function'?candidate:
+          (candidate&&typeof candidate.default==='function'?candidate.default:null);
+        const instance=factory?await factory({locateFile:(name)=>base+name,noInitialRun:true}):candidate;
+        if(instance&&instance.FS&&(typeof instance.callMain==='function'||typeof instance._main==='function')){
+          q=instance;break;
+        }
+        attempts.push('sin FS/callMain');
+      }catch(err){attempts.push(String(err?.message||err).slice(0,110));}
+    }
+    if(!q){
+      failures.push(new URL(base).hostname+': exportaciones ['+Object.keys(mod).join(', ')+']; '+attempts.slice(0,3).join('; '));
       continue;
     }
-    const q=await factory({locateFile:(name)=>base+name,noInitialRun:true});
-    if(!q||!q.FS||typeof q.callMain!=='function'){
-      failures.push(new URL(base).hostname+': módulo cargado sin FS/callMain');continue;
+    if(typeof q.callMain!=='function'){
+      failures.push(new URL(base).hostname+': sin interfaz callMain compatible');continue;
     }
     return q;
    }catch(err){failures.push(new URL(base).hostname+': '+String(err?.message||err).slice(0,220));}
@@ -35,7 +50,7 @@ window.orlandoProtectPdf=async function(file,password,confirm){
   if(!password||password.length<8)throw Error('Utiliza una contraseña de al menos 8 caracteres.');
   if(password!==confirm)throw Error('Las contraseñas no coinciden.');
   const q=await engine();
-  const nonce=crypto.randomUUID().replace(/-/g,'');
+  const nonce=(crypto.randomUUID?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('')).replace(/-/g,'');
   const inPath='/in_'+nonce+'.pdf',outPath='/out_'+nonce+'.pdf';
   try{
     q.FS.writeFile(inPath,new Uint8Array(await file.arrayBuffer()));
