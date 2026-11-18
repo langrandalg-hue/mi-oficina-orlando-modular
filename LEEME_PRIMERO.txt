@@ -1,0 +1,9 @@
+MI OFICINA ORLANDO — SEPARACIÓN MODULAR BETA
+
+Sube TODOS los archivos y carpetas al mismo repositorio GitHub Pages conservando la estructura.
+La portada index.html enlaza a pdf/, audio/, imagenes/, escaner/, zip/ y video/.
+Cada carpeta contiene una copia autónoma de la aplicación anterior con entrada directa a su herramienta; esto aísla las actualizaciones y las rutas. La limpieza/refactorización profunda del código compartido queda pendiente.
+El editor de vídeo es un marcador de posición, NO está implementado.
+Se mantienen las limitaciones anteriores de protección PDF, exportación de audio y funciones experimentales.
+IMPORTANTE: hacer copia de seguridad antes de sustituir la web actual. Los datos locales del navegador pueden depender de la ruta de la aplicación; exporta borradores importantes antes de migrar.
+No probado en Safari iPhone; verificar en el dispositivo.
