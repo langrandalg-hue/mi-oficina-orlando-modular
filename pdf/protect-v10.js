@@ -1,16 +1,32 @@
 
 /* Mi Oficina Orlando V10 — cifrado PDF local QPDF/WASM.
    El módulo se descarga desde jsDelivr; el contenido del PDF no se envía. */
-const CDN='https://cdn.jsdelivr.net/npm/@soulehshaikh99/qpdf-wasm@0.4.1/dist/';
+const SOURCES=[
+  'https://cdn.jsdelivr.net/npm/@soulehshaikh99/qpdf-wasm@0.4.1/dist/',
+  'https://unpkg.com/@soulehshaikh99/qpdf-wasm@0.4.1/dist/'
+];
 let enginePromise;
 async function engine(){
-  if(!enginePromise) enginePromise=(async()=>{
-    const lib=await import(CDN+'qpdf.js');
-    const factory=lib.default||lib.createModule;
-    if(typeof factory!=='function') throw Error('El motor de cifrado no está disponible en este navegador.');
-    return factory({locateFile:(name)=>CDN+name});
-  })().catch(e=>{enginePromise=null;throw e});
-  return enginePromise;
+ if(!enginePromise) enginePromise=(async()=>{
+  const failures=[];
+  for(const base of SOURCES){
+   try{
+    const mod=await import(base+'qpdf.js');
+    const factory=mod.default||mod.createModule||mod.Module||mod.createQPDFModule;
+    if(typeof factory!=='function'){
+      failures.push(new URL(base).hostname+': exportaciones disponibles '+Object.keys(mod).join(', '));
+      continue;
+    }
+    const q=await factory({locateFile:(name)=>base+name,noInitialRun:true});
+    if(!q||!q.FS||typeof q.callMain!=='function'){
+      failures.push(new URL(base).hostname+': módulo cargado sin FS/callMain');continue;
+    }
+    return q;
+   }catch(err){failures.push(new URL(base).hostname+': '+String(err?.message||err).slice(0,220));}
+  }
+  throw Error('Motor QPDF no disponible. Diagnóstico: '+failures.join(' | '));
+ })().catch(err=>{enginePromise=null;throw err});
+ return enginePromise;
 }
 function safeName(name){return (name||'documento.pdf').replace(/\.pdf$/i,'').replace(/[\\/:*?"<>|]/g,'_')+'_protegido.pdf'}
 window.orlandoProtectPdf=async function(file,password,confirm){
@@ -26,7 +42,7 @@ window.orlandoProtectPdf=async function(file,password,confirm){
     // Contraseña de propietario distinta y aleatoria: no permite apertura sin la del usuario.
     const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);
     const owner=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
-    const code=q.callMain([inPath,'--encrypt','--user-password='+password,'--owner-password='+owner,'--bits=256','--',outPath]);
+    const code=q.callMain(['--encrypt',password,owner,'256','--',inPath,outPath]);
     if(code!==0)throw Error('QPDF no pudo cifrar este documento (código '+code+').');
     const output=q.FS.readFile(outPath);
     if(!output||output.length<100)throw Error('El archivo cifrado está vacío.');
