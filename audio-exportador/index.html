@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#172b4d"><title>Mi Oficina Orlando · Audio</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172b4d;background:#f6f8fb}*{box-sizing:border-box}
+body{margin:0;padding:env(safe-area-inset-top) 15px env(safe-area-inset-bottom)}main{max-width:700px;margin:24px auto}
+h1{font-size:25px}h2{font-size:19px}.panel{background:#fff;border:1px solid #e1e6ef;border-radius:18px;padding:18px;margin:16px 0}
+label{display:block;font-weight:650;margin:14px 0 7px}input,select,audio{width:100%}input,select{font-size:16px;border:1px solid #cbd5e1;border-radius:11px;padding:12px;background:white}
+input[type=range]{padding:0}button{background:#172b4d;color:white;border:0;border-radius:12px;padding:13px 16px;font-size:15px;cursor:pointer;margin:5px 4px 5px 0}
+button:disabled{opacity:.45}.secondary{background:#e8edf5;color:#172b4d}.muted{color:#64748b;font-size:13px;line-height:1.5}
+#status{white-space:pre-wrap}a{color:#172b4d}canvas{width:100%;height:110px;background:#f4f6fc;border-radius:12px}
+</style></head><body><main><h1>🎵 Mi Oficina Orlando · Audio</h1>
+<p class="muted">Editor de recorte para iPhone. No modifica los módulos PDF ni el resto de la aplicación.</p>
+<section class="panel"><h2>Recortar audio</h2><label for="file">Seleccionar archivo MP3, M4A o WAV</label><input id="file" type="file" accept="audio/*,.mp3,.m4a,.wav">
+<div id="editor" hidden><p id="info" class="muted"></p><canvas id="wave"></canvas>
+<label for="start">Inicio (segundos)</label><input id="start" type="number" min="0" step=".01" value="0">
+<label for="end">Final (segundos)</label><input id="end" type="number" min="0" step=".01">
+<label for="format">Formato de salida</label><select id="format"><option value="wav">WAV · sin compresión</option><option value="mp3">MP3 · 128 kb/s</option><option value="m4a">M4A · AAC (si Safari lo admite)</option></select>
+<button id="make">Crear recorte</button><p class="muted">MP3 necesita conexión para cargar el codificador. M4A se codifica en tiempo real y solo si Safari admite audio MP4.</p></div>
+<p id="status" role="status" class="muted"></p></section>
+<section id="result" class="panel" hidden><h2>Vista previa del resultado</h2><audio id="player" controls></audio>
+<label for="filename">Nombre del archivo</label><input id="filename">
+<button id="save">Guardar archivo</button><button id="share" class="secondary">Compartir</button><button id="edit" class="secondary">Seguir editando</button>
+<p class="muted">No se descarga nada automáticamente. Usa Guardar o Compartir cuando estés conforme.</p></section>
+</main><script>
+const $=id=>document.getElementById(id);
+let buffer=null,ctx=null,resultBlob=null,resultUrl=null,originalName="audio";
+const mimeM4a=["audio/mp4;codecs=mp4a.40.2","audio/mp4"].find(t=>window.MediaRecorder?.isTypeSupported?.(t));
+if(!mimeM4a){$('format').querySelector('[value=m4a]').textContent='M4A · no disponible en este Safari';$('format').querySelector('[value=m4a]').disabled=true}
+$('file').addEventListener('change',async()=>{
+ const f=$('file').files[0];if(!f)return;
+ $('editor').hidden=true;$('result').hidden=true;$('status').textContent="Analizando audio…";
+ try{
+  if(ctx)await ctx.close();ctx=new (window.AudioContext||window.webkitAudioContext)();
+  buffer=await ctx.decodeAudioData(await f.arrayBuffer());
+  if(buffer.duration>3600)throw Error('Para proteger la memoria del iPhone, el límite es una hora.');
+  originalName=f.name.replace(/\.[^.]+$/,'');
+  $('start').value='0';$('end').value=buffer.duration.toFixed(2);
+  $('info').textContent=`${f.name} · ${buffer.duration.toFixed(2)} segundos · ${buffer.numberOfChannels} canal(es)`;
+  const c=$('wave'),dpr=Math.min(devicePixelRatio||1,2),w=c.clientWidth||320,h=110;
+  c.width=w*dpr;c.height=h*dpr;const g=c.getContext('2d');g.scale(dpr,dpr);g.fillStyle='#7054bc';
+  const data=buffer.getChannelData(0);for(let x=0;x<w;x++){const a=Math.floor(x*data.length/w),b=Math.max(a+1,Math.floor((x+1)*data.length/w)),step=Math.max(1,Math.floor((b-a)/30));let peak=0;for(let i=a;i<b;i+=step)peak=Math.max(peak,Math.abs(data[i]));const bh=Math.max(1,peak*h*.85);g.fillRect(x,(h-bh)/2,1,bh)}
+  $('editor').hidden=false;$('status').textContent='Audio listo para editar.';
+ }catch(e){$('status').textContent='No se pudo abrir: '+e.message}
+});
+function trimmed(start,end,rate=buffer.sampleRate){
+ const channels=Math.min(2,buffer.numberOfChannels),from=Math.floor(start*buffer.sampleRate),to=Math.min(buffer.length,Math.floor(end*buffer.sampleRate)),n=to-from;
+ const b=ctx.createBuffer(channels,n,buffer.sampleRate);
+ for(let ch=0;ch<channels;ch++)b.copyToChannel(buffer.getChannelData(ch).subarray(from,to),ch);
+ return b;
+}
+function wav(b){
+ const ch=b.numberOfChannels,n=b.length,bytes=44+n*ch*2,a=new ArrayBuffer(bytes),v=new DataView(a);let p=0;
+ const str=s=>{for(const c of s)v.setUint8(p++,c.charCodeAt(0))},u16=x=>{v.setUint16(p,x,true);p+=2},u32=x=>{v.setUint32(p,x,true);p+=4};
+ str('RIFF');u32(bytes-8);str('WAVEfmt ');u32(16);u16(1);u16(ch);u32(b.sampleRate);u32(b.sampleRate*ch*2);u16(ch*2);u16(16);str('data');u32(n*ch*2);
+ for(let i=0;i<n;i++)for(let c=0;c<ch;c++){let x=Math.max(-1,Math.min(1,b.getChannelData(c)[i]));v.setInt16(p,x<0?x*32768:x*32767,true);p+=2}
+ return new Blob([a],{type:'audio/wav'});
+}
+async function loadMp3(){
+ if(window.lamejs?.Mp3Encoder)return;
+ await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js';s.onload=resolve;s.onerror=()=>reject(Error('No se pudo cargar el codificador MP3. Comprueba Internet.'));document.head.append(s)});
+ if(!window.lamejs?.Mp3Encoder)throw Error('Codificador MP3 no disponible.');
+}
+async function mp3(b){
+ await loadMp3();const rate=44100,ch=b.numberOfChannels,off=new OfflineAudioContext(ch,Math.ceil(b.duration*rate),rate),src=off.createBufferSource();
+ src.buffer=b;src.connect(off.destination);src.start();const pcm=await off.startRendering(),enc=new lamejs.Mp3Encoder(ch,rate,128),parts=[],step=1152;
+ const samples=Array.from({length:ch},(_,i)=>pcm.getChannelData(i));
+ function int16(a,from,to){const out=new Int16Array(to-from);for(let i=from;i<to;i++){const x=Math.max(-1,Math.min(1,a[i]));out[i-from]=x<0?x*32768:x*32767}return out}
+ for(let i=0;i<pcm.length;i+=step){const end=Math.min(i+step,pcm.length),left=int16(samples[0],i,end),right=ch===2?int16(samples[1],i,end):null,chunk=ch===2?enc.encodeBuffer(left,right):enc.encodeBuffer(left);if(chunk.length)parts.push(new Uint8Array(chunk))}
+ const tail=enc.flush();if(tail.length)parts.push(new Uint8Array(tail));
+ return new Blob(parts,{type:'audio/mpeg'});
+}
+async function m4a(b){
+ if(!mimeM4a)throw Error('Safari no permite codificar M4A en este dispositivo.');
+ const ac=new (window.AudioContext||window.webkitAudioContext)({sampleRate:b.sampleRate}),dest=ac.createMediaStreamDestination(),src=ac.createBufferSource();
+ src.buffer=b;src.connect(dest);const rec=new MediaRecorder(dest.stream,{mimeType:mimeM4a,audioBitsPerSecond:128000}),parts=[];
+ try{
+  await ac.resume();
+  const done=new Promise((resolve,reject)=>{rec.ondataavailable=e=>{if(e.data.size)parts.push(e.data)};rec.onerror=e=>reject(e.error||Error('Error al codificar M4A'));rec.onstop=resolve});
+  rec.start();src.start();src.onended=()=>{if(rec.state!=='inactive')rec.stop()};await done;
+  const blob=new Blob(parts,{type:'audio/mp4'});if(!blob.size)throw Error('Safari no generó datos M4A');return blob;
+ }finally{try{src.stop()}catch(e){}dest.stream.getTracks().forEach(t=>t.stop());await ac.close()}
+}
+$('make').onclick=async()=>{
+ const start=Number($('start').value),end=Number($('end').value),format=$('format').value;
+ if(!buffer||!Number.isFinite(start)||!Number.isFinite(end)||start<0||end<=start||end>buffer.duration+.01){$('status').textContent='Comprueba el inicio y el final del recorte.';return}
+ $('make').disabled=true;$('status').textContent='Codificando '+format.toUpperCase()+'…';$('result').hidden=true;
+ try{
+  const b=trimmed(start,end);resultBlob=format==='mp3'?await mp3(b):format==='m4a'?await m4a(b):wav(b);
+  if(resultUrl)URL.revokeObjectURL(resultUrl);resultUrl=URL.createObjectURL(resultBlob);
+  $('player').src=resultUrl;$('filename').value=originalName+'_recortado.'+format;$('result').hidden=false;
+  $('status').textContent='Resultado listo. Escúchalo antes de guardar.';
+ }catch(e){$('status').textContent='No se pudo exportar: '+e.message}finally{$('make').disabled=false}
+};
+function outputFile(){let name=$('filename').value.trim().replace(/[\\/:*?"<>|]/g,'_');const ext=$('format').value;if(!name.toLowerCase().endsWith('.'+ext))name+='.'+ext;return new File([resultBlob],name,{type:resultBlob.type})}
+$('save').onclick=()=>{if(!resultBlob)return;const f=outputFile(),a=document.createElement('a'),u=URL.createObjectURL(f);a.href=u;a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)};
+$('share').onclick=async()=>{if(!resultBlob)return;const f=outputFile();try{if(navigator.canShare?.({files:[f]}))await navigator.share({files:[f],title:f.name});else throw Error('Compartir archivos no disponible en este navegador. Usa Guardar archivo.')}catch(e){if(e.name!=='AbortError')$('status').textContent=e.message}};
+$('edit').onclick=()=>{$('result').hidden=true;$('status').textContent='Puedes ajustar el recorte y volver a exportar.'};
+</script></body></html>
