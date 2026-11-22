@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Mi Vídeo Orlando · V9.2 Pruebas</title><style>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Mi Vídeo Orlando · V9.3 Pruebas</title><style>
 :root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#192b4e;background:#f4f7fc}*{box-sizing:border-box}body{margin:0;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}main{max-width:760px;margin:auto;padding:16px}.top{position:sticky;top:0;z-index:10;background:#f4f7fcef;padding:10px 0;border-bottom:1px solid #dbe3ef}.back{display:inline-block;text-decoration:none;color:#1a4e8b;font-weight:700;padding:9px 0}h1{font-size:28px;margin:16px 0 5px}h2{font-size:19px;margin:0 0 12px}p{line-height:1.5}.muted,small{color:#60718a}.card{background:#fff;border:1px solid #dbe3ee;border-radius:18px;padding:17px;margin:14px 0}.btn{border:0;border-radius:11px;background:#1b2c50;color:#fff;padding:12px 15px;font-size:15px;font-weight:650;cursor:pointer}.btn.alt{background:#e9eff8;color:#1b2c50}.btn:disabled{opacity:.45}input[type=file],input[type=text],input[type=number],select{width:100%;padding:12px;border:1px solid #cbd6e5;border-radius:10px;font-size:16px;background:white}label{font-weight:650;display:block;margin:10px 0 6px}video,canvas{width:100%;background:#111827;border-radius:12px;display:block}canvas{aspect-ratio:16/9;object-fit:contain}.item{padding:12px 0;border-bottom:1px solid #e6edf6}.item:last-child{border:0}.itemhead{display:flex;align-items:center;justify-content:space-between;gap:8px}.controls{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.controls button{border:1px solid #cbd6e5;border-radius:8px;background:#f2f6fb;padding:9px;color:#1b2c50}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.status{white-space:pre-wrap;background:#f0f5fc;border-radius:10px;padding:12px;line-height:1.5}.hidden{display:none}.note{font-size:13px;color:#62728a}a.result{display:inline-block;background:#17634b;color:white;border-radius:10px;padding:12px 15px;text-decoration:none;font-weight:700}#timeline{max-height:350px;overflow:auto}#player{margin-top:10px}#musicPreview{width:100%}#screen{touch-action:none;cursor:grab}#progressBox{padding:10px 0}#screen.dragging{cursor:grabbing}</style></head><body><main><div class="top"><a class="back" href="../index.html" id="back">← Volver a Mi Oficina</a></div><h1>🎬 Mi Vídeo Orlando</h1><p class="muted">V9.0 · Títulos táctiles, transiciones y progreso de creación. Los archivos se trabajan en tu dispositivo.</p><section class="card"><h2>1. Añadir vídeos y fotografías</h2><input id="media" type="file" accept="image/*,video/*" multiple><p class="note">Selecciona varios archivos. Puedes ordenarlos, quitar elementos y ajustar su duración.</p><div id="timeline"></div></section><section class="card"><h2>2. Música y título</h2><label for="music">Música propia (opcional)</label><input id="music" type="file" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg,.flac,.webm,.mp4"><audio id="musicPreview" controls class="hidden"></audio><label for="title">Título sobre el vídeo (opcional)</label><input id="title" type="text" maxlength="80" placeholder="Mi viaje a Laponia"><label for="format">Proporción</label><select id="format"><option value="16:9">Horizontal · 16:9</option><option value="9:16">Vertical · 9:16</option><option value="1:1">Cuadrado · 1:1</option></select></section><section class="card" id="advanced"><h2>Edición avanzada · V2 de pruebas</h2>
 <p class="note">Ajustes para el montaje completo. Los cambios se aplican tanto a la vista previa como al vídeo generado.</p>
 <div class="pair"><div><label for="titleColor">Color del título</label><input id="titleColor" type="color" value="#ffffff" style="width:100%;height:45px"></div><div><label for="titleSize">Tamaño del título</label><select id="titleSize"><option value="1">Normal</option><option value="0.7">Pequeño</option><option value="1.4">Grande</option></select></div></div>
@@ -44,97 +44,87 @@ const itemSeconds=it=>it.type==='image'?Math.max(1,Math.min(30,Number(it.duratio
 const clock=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 function seekUI(){const total=totalDuration();$('previewSeek').value=total?Math.round(previewCursor/total*1000):0;$('previewTime').textContent=clock(previewCursor)+' / '+clock(total)}
 function locatePreview(t){let remaining=Math.max(0,t);for(let i=0;i<items.length;i++){const d=itemSeconds(items[i]);if(remaining<d||i===items.length-1)return {index:i,offset:Math.min(remaining,d),base:t-remaining};remaining-=d}return {index:0,offset:0,base:0}}
-function previewStop(reset=true){previewGeneration++;runToken++;previewPaused=true;previewing=false;stopFlag=true;try{activeVideo?.pause()}catch(e){}try{activeAudio?.pause()}catch(e){}activeVideo=null;activeAudio=null;if(reset)previewCursor=0;$('preview').disabled=false;seekUI();status(reset?'Reproducción detenida. Pulsa Reproducir para empezar.':'Montaje en pausa. Pulsa Reproducir / Reanudar para continuar.')}
+function previewStop(reset=true){clearPreviewVideos();previewGeneration++;runToken++;previewPaused=true;previewing=false;stopFlag=true;try{activeVideo?.pause()}catch(e){}try{activeAudio?.pause()}catch(e){}activeVideo=null;activeAudio=null;if(reset)previewCursor=0;$('preview').disabled=false;seekUI();status(reset?'Reproducción detenida. Pulsa Reproducir para empezar.':'Montaje en pausa. Pulsa Reproducir / Reanudar para continuar.')}
 function stop(){if(exportingNow){stopFlag=true;runToken++;try{activeVideo?.pause()}catch(e){}try{activeAudio?.pause()}catch(e){}status('Deteniendo exportación…');return}previewStop(true)}
 $('stop').onclick=stop;
 $('pause').onclick=()=>{if(!previewing)return;previewStop(false)};
 $('restart').onclick=()=>{previewStop(true);$('preview').click()};
 $('previewSeek').addEventListener('input',()=>{if(exportingNow)return;const wasPlaying=previewing;previewStop(false);previewCursor=totalDuration()*Number($('previewSeek').value)/1000;seekUI();if(wasPlaying)$('preview').click();else{const loc=locatePreview(previewCursor),it=items[loc.index];if(it?.type==='image')frame(it.media,titleFor(it),loc.offset/itemSeconds(it),null,'none',0,0)}});
+// Vista previa V9.3: reloj continuo y posición absoluta, independiente de los eventos de vídeo.
+// Cada clip tiene su propio elemento de vídeo reutilizable durante la sesión de reproducción.
+let previewVideos=[];
+function clearPreviewVideos(){for(const v of previewVideos){if(!v)continue;try{v.pause();v.removeAttribute('src');v.load()}catch(e){}}previewVideos=[]}
+function preparePreviewVideos(){
+ clearPreviewVideos();
+ previewVideos=items.map(it=>{
+  if(it.type!=='video')return null;
+  const v=document.createElement('video');v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');
+  v.playsInline=true;v.muted=true;v.defaultMuted=true;v.preload='auto';v.src=it.url;
+  v.load();return v;
+ });
+}
 async function runPreview(gen){
- const total=totalDuration();let prev=null;
- while(gen===previewGeneration&&!previewPaused&&previewCursor<total){
-  const loc=locatePreview(previewCursor),it=items[loc.index];if(!it)break;
-  const duration=itemSeconds(it),caption=titleFor(it),trans=it.transition&&it.transition!=='default'?it.transition:$('transition').value;
-  const td=Math.min(Number($('transitionDuration').value)*1000,Math.max(250,duration*400));
-  status('Reproduciendo elemento '+(loc.index+1)+' de '+items.length+' · '+clock(previewCursor)+' / '+clock(total));
-  if(it.type==='image'){
-   let last=performance.now();
-   while(gen===previewGeneration&&!previewPaused&&previewCursor<total){
-    const now=performance.now(),dt=Math.min(.15,(now-last)/1000);last=now;
-    const here=locatePreview(previewCursor);if(here.index!==loc.index)break;
-    frame(it.media,caption,here.offset/duration,prev,loc.index?trans:'none',here.offset*1000,td);
-    previewCursor=Math.min(total,previewCursor+dt);seekUI();await sleep(35);
+ const total=totalDuration();let prev=null,last=performance.now(),lastIndex=-1;
+ let waitingForVideo=false,videoStartAttempt=0,lastVideoTime=-1,lastAdvance=0;
+ try{
+  while(gen===previewGeneration&&!previewPaused&&previewCursor<total){
+   const now=performance.now(),dt=Math.min(.12,Math.max(0,(now-last)/1000));last=now;
+   const loc=locatePreview(previewCursor),it=items[loc.index];if(!it)break;
+   const duration=itemSeconds(it),caption=titleFor(it),trans=it.transition&&it.transition!=='default'?it.transition:$('transition').value;
+   const td=Math.min(Number($('transitionDuration').value)*1000,Math.max(250,duration*400));
+   if(loc.index!==lastIndex){
+    if(lastIndex>=0&&previewVideos[lastIndex])try{previewVideos[lastIndex].pause()}catch(e){}
+    prev=document.createElement('canvas');prev.width=canvas.width;prev.height=canvas.height;
+    prev.getContext('2d').drawImage(canvas,0,0);
+    lastIndex=loc.index;waitingForVideo=false;videoStartAttempt=0;lastVideoTime=-1;lastAdvance=now;
+    status('Reproduciendo elemento '+(loc.index+1)+' de '+items.length+' · '+clock(previewCursor)+' / '+clock(total));
    }
-  }else{
-   // iOS Safari: video.play() can stall at each new media element. Keep the
-   // preview clock responsive, request muted inline playback, and retry safely.
-   const v=document.createElement('video');activeVideo=v;
-   v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');
-   v.playsInline=true;v.muted=true;v.defaultMuted=true;v.autoplay=true;v.preload='auto';
-   v.src=it.url;v.load();
-   const startTime=Math.max(0,Number(it.start)||0)+loc.offset;
-   const token=runToken;
-   const waitReady=async()=>{
-    if(v.readyState>=2)return;
-    await waitForVideo(v,'loadeddata',8000,token);
-   };
-   try{await waitReady()}catch(e){
-    if(gen===previewGeneration&&!previewPaused)status('El vídeo '+(loc.index+1)+' tarda en cargar: '+e.message);
-    if(gen!==previewGeneration||previewPaused)break;
-   }
-   if(gen!==previewGeneration||previewPaused)break;
-   try{
-    if(Math.abs(v.currentTime-startTime)>.12){
-     v.currentTime=startTime;
-     await Promise.race([new Promise(resolve=>v.addEventListener('seeked',resolve,{once:true})),sleep(900)]);
-    }
-   }catch(e){}
-   if(gen!==previewGeneration||previewPaused)break;
-   const attemptPlay=async()=>{
-    try{await Promise.race([v.play(),sleep(1800).then(()=>{throw Error('Inicio de vídeo lento')})]);return !v.paused}
-    catch(e){return false}
-   };
-   let started=await attemptPlay();
-   if(!started&&gen===previewGeneration&&!previewPaused){
-    v.muted=true;v.setAttribute('muted','');started=await attemptPlay();
-   }
-   if(!started&&gen===previewGeneration&&!previewPaused){
-    previewStop(false);
-    status('Safari no ha podido iniciar el clip '+(loc.index+1)+'. Pulsa Reanudar para intentarlo de nuevo.');
-    break;
-   }
-   let lastFrame=performance.now(),lastPosition=v.currentTime,stallSince=performance.now();
-   while(gen===previewGeneration&&!previewPaused&&v.currentTime<Number(it.end)-.03&&!v.ended){
-    const now=performance.now();
-    if(v.currentTime>lastPosition+.025){lastPosition=v.currentTime;stallSince=now}
-    if(now-stallSince>1400){
-     const recovered=await attemptPlay();
-     if(!recovered||v.currentTime<=lastPosition+.025){
-      previewStop(false);
-      status('El clip '+(loc.index+1)+' se ha detenido en Safari. Pulsa Reanudar para continuar.');
-      break;
+   if(it.type==='image'){
+    frame(it.media,caption,loc.offset/duration,prev,loc.index?trans:'none',loc.offset*1000,td);
+    previewCursor=Math.min(total,previewCursor+dt);
+   }else{
+    const v=previewVideos[loc.index];activeVideo=v;
+    const expected=(Number(it.start)||0)+loc.offset;
+    if(v){
+     if(!waitingForVideo){
+      waitingForVideo=true;videoStartAttempt=now;
+      try{if(Math.abs(v.currentTime-expected)>.25)v.currentTime=expected}catch(e){}
+      // No esperar a play(): Safari puede dejar su promesa pendiente.
+      try{v.play().catch(()=>{})}catch(e){}
      }
-     stallSince=performance.now();lastPosition=v.currentTime;
+     if(v.readyState>=2){
+      if(v.paused&&now-videoStartAttempt>600){
+       try{v.play().catch(()=>{})}catch(e){}videoStartAttempt=now;
+      }
+      if(v.currentTime>lastVideoTime+.02){lastVideoTime=v.currentTime;lastAdvance=now}
+      if(now-lastAdvance>2200){
+       status('El clip '+(loc.index+1)+' no avanza. Safari puede necesitar permiso para reproducirlo; pulsa Pausa y Reanudar.');
+       previewPaused=true;previewing=false;$('preview').disabled=false;
+       try{activeAudio?.pause()}catch(e){}break;
+      }
+      frame(v,caption,loc.offset/duration,prev,loc.index?trans:'none',loc.offset*1000,td);
+      // El reloj del montaje manda: no retroceder al principio del clip al reanudar.
+      previewCursor=Math.min(total,previewCursor+dt);
+     }else if(now-videoStartAttempt>8000){
+      status('El clip '+(loc.index+1)+' no se puede cargar. Comprueba su formato o prueba otro archivo.');
+      previewPaused=true;previewing=false;$('preview').disabled=false;
+      try{activeAudio?.pause()}catch(e){}break;
+     }
     }
-    const elapsed=Math.max(0,v.currentTime-(Number(it.start)||0));
-    previewCursor=Math.min(total,loc.base+elapsed);
-    if(v.readyState>=2)frame(v,caption,elapsed/duration,prev,loc.index?trans:'none',elapsed*1000,td);
-    seekUI();lastFrame=now;await sleep(35);
    }
-   try{v.pause();v.removeAttribute('src');v.load()}catch(e){}
-   if(activeVideo===v)activeVideo=null;
-   if(gen!==previewGeneration||previewPaused)break;
-   previewCursor=Math.min(total,loc.base+duration);
-
+   seekUI();await sleep(35);
   }
-  prev=document.createElement('canvas');prev.width=canvas.width;prev.height=canvas.height;prev.getContext('2d').drawImage(canvas,0,0);
+ }finally{
+  if(gen===previewGeneration){
+   try{activeVideo?.pause()}catch(e){}activeVideo=null;
+   if(!previewPaused){previewing=false;previewPaused=true;try{activeAudio?.pause()}catch(e){}$('preview').disabled=false;seekUI();status('Vista previa terminada. Puedes volver a reproducir.')}
+  }
  }
- if(gen===previewGeneration&&!previewPaused){previewing=false;previewPaused=true;try{activeAudio?.pause()}catch(e){}$('preview').disabled=false;seekUI();status('Vista previa terminada. Puedes volver a reproducir.')}
 }
 $('preview').onclick=async()=>{
  if(exportingNow||previewing)return;if(!items.length){status('Primero añade fotografías o vídeos.');return}
  if(previewCursor>=totalDuration())previewCursor=0;
- previewGeneration++;const gen=previewGeneration;previewPaused=false;previewing=true;stopFlag=false;runToken++;
+ previewGeneration++;const gen=previewGeneration;previewPaused=false;previewing=true;stopFlag=false;runToken++;preparePreviewVideos();
  $('preview').disabled=true;
  if(musicURL){try{activeAudio=new Audio(musicURL);activeAudio.loop=true;activeAudio.volume=Number($('musicVolume').value)/100;activeAudio.currentTime=previewCursor;activeAudio.play().catch(()=>{})}catch(e){}}
  try{await runPreview(gen)}catch(e){if(gen===previewGeneration){previewStop(false);status('Error de vista previa: '+e.message+'. Puedes reanudar o reiniciar.')}}
