@@ -8,7 +8,7 @@
 .trim-clip-preview{width:100%;max-height:220px;object-fit:contain;margin:9px 0;background:#111827}
 .trim-panel .trim-row{margin:6px 0}
 .trim-panel [data-trim]{display:none}.trim-tools{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.trim-tools button{flex:1 1 auto;font-size:13px;padding:9px 10px}.trim-position{font-variant-numeric:tabular-nums;font-weight:700;color:#b34b00}
-</style></head><body><main><div class="top"><a class="back" href="../index.html" id="back">← Volver a Mi Oficina</a></div><h1>🎬 Mi Vídeo Orlando</h1><p class="muted">V10.5 · Google Photos Picker (pruebas) y GoPro Quik; reproducción y exportación conservadas. Los archivos se trabajan en tu dispositivo.</p><section class="card"><h2>1. Añadir vídeos y fotografías</h2><input id="media" type="file" accept="image/*,video/*" multiple><p class="note">Selecciona varios archivos. Puedes ordenarlos, quitar elementos y ajustar su duración.</p><div class="import-sources" style="margin-top:14px;padding:13px;border:1px solid #dbe3ee;border-radius:12px;background:#f7faff"><strong>☁️ Importar desde otras aplicaciones</strong><p class="note">Google Fotos: selecciona directamente mediante el selector oficial de Google. Solo se solicitará permiso para los elementos elegidos. GoPro Quik: utiliza Compartir o Exportar y después elige el archivo.</p><div class="controls"><button type="button" class="btn alt" id="fromGoogle">📷 Seleccionar en Google Fotos</button><button type="button" class="btn alt" id="fromQuik">🎥 GoPro Quik</button><button type="button" class="btn alt" id="fromFiles">📁 Elegir fotos o vídeos</button></div><div class="controls" style="margin-top:8px"><button type="button" class="btn alt hidden" id="googleCheck">↻ Comprobar selección de Google</button><button type="button" class="btn alt hidden" id="googleCancel">Cancelar selección</button></div><div id="importGuide" class="note" role="status" aria-live="polite">Elige el origen para ver los pasos.</div><p class="note">Si una foto o un vídeo está en la nube, espera a que termine de descargarse antes de seleccionarlo. Los vídeos grandes pueden tardar en prepararse.</p></div><div id="timeline"></div></section><section class="card"><h2>2. Música y título</h2><label for="music">Música propia (opcional)</label><input id="music" type="file" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg,.flac,.webm,.mp4"><audio id="musicPreview" controls class="hidden"></audio><label for="title">Título sobre el vídeo (opcional)</label><input id="title" type="text" maxlength="80" placeholder="Mi viaje a Laponia"><label for="format">Proporción</label><select id="format"><option value="16:9">Horizontal · 16:9</option><option value="9:16">Vertical · 9:16</option><option value="1:1">Cuadrado · 1:1</option></select></section><section class="card" id="advanced"><h2>Edición avanzada · V2 de pruebas</h2>
+</style></head><body><main><div class="top"><a class="back" href="../index.html" id="back">← Volver a Mi Oficina</a></div><h1>🎬 Mi Vídeo Orlando</h1><p class="muted">V10.6 · Importación manual desde Fotos o Archivos. Sin conexión ni autorización a cuentas de Google. Reproducción y exportación conservadas.</p><section class="card"><h2>1. Añadir vídeos y fotografías</h2><input id="media" type="file" accept="image/*,video/*" multiple><p class="note">Selecciona varios archivos. Puedes ordenarlos, quitar elementos y ajustar su duración.</p><div class="import-sources" style="margin-top:14px;padding:13px;border:1px solid #dbe3ee;border-radius:12px;background:#f7faff"><strong>📁 Importar archivos descargados</strong><p class="note">Mi Vídeo Orlando no solicita acceso a Google Fotos ni a GoPro Quik. Primero descarga o exporta tus fotos y vídeos desde esas aplicaciones a Fotos o Archivos del iPhone. Después selecciónalos aquí.</p><div class="controls"><button type="button" class="btn alt" id="fromGoogle">📷 Cómo descargar de Google Fotos</button><button type="button" class="btn alt" id="fromQuik">🎥 Cómo exportar de GoPro Quik</button><button type="button" class="btn alt" id="fromFiles">📁 Elegir fotos o vídeos</button></div><div id="importGuide" class="note" role="status" aria-live="polite">Elige el origen para ver los pasos.</div><p class="note">Si una foto o un vídeo está en la nube, espera a que termine de descargarse antes de seleccionarlo. Los vídeos grandes pueden tardar en prepararse.</p></div><div id="timeline"></div></section><section class="card"><h2>2. Música y título</h2><label for="music">Música propia (opcional)</label><input id="music" type="file" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg,.flac,.webm,.mp4"><audio id="musicPreview" controls class="hidden"></audio><label for="title">Título sobre el vídeo (opcional)</label><input id="title" type="text" maxlength="80" placeholder="Mi viaje a Laponia"><label for="format">Proporción</label><select id="format"><option value="16:9">Horizontal · 16:9</option><option value="9:16">Vertical · 9:16</option><option value="1:1">Cuadrado · 1:1</option></select></section><section class="card" id="advanced"><h2>Edición avanzada · V2 de pruebas</h2>
 <p class="note">Ajustes para el montaje completo. Los cambios se aplican tanto a la vista previa como al vídeo generado.</p>
 <div class="pair"><div><label for="titleColor">Color del título</label><input id="titleColor" type="color" value="#ffffff" style="width:100%;height:45px"></div><div><label for="titleSize">Tamaño del título</label><select id="titleSize"><option value="1">Normal</option><option value="0.7">Pequeño</option><option value="1.4">Grande</option></select></div></div>
 <label for="titlePosition">Posición inicial del título (también puedes arrastrarlo sobre la vista)</label><select id="titlePosition"><option value="bottom">Abajo</option><option value="center">Centro</option><option value="top">Arriba</option></select>
@@ -101,7 +101,7 @@ list.querySelectorAll('[data-trim-play]').forEach(b=>b.addEventListener('click',
  try{await v.play();b.textContent='▶ Volver a ver selección'}catch(e){status('Toca ▶ en el reproductor para escuchar la selección. '+e.message)}
 }));
 list.querySelectorAll('[data-speed]').forEach(sel=>sel.addEventListener('change',()=>{const it=items[Number(sel.dataset.speed)];if(!it)return;snapshot();it.speed=Number(sel.value)||1;mark();update();status('Velocidad del clip ajustada a '+it.speed+'×.')}));
-status(items.length?`${items.length} elemento(s) preparados. Puedes previsualizar o crear el vídeo.`:'Añade archivos para comenzar.')}function meta(file,url){return new Promise(resolve=>{if(file.type.startsWith('image/')){const im=new Image();im.onload=()=>resolve({file,url,type:'image',duration:3,media:im,caption:'',transition:'default'});im.onerror=()=>resolve(null);im.src=url}else{const v=document.createElement('video');v.preload='metadata';v.playsInline=true;v.onloadedmetadata=()=>resolve({file,url,type:'video',start:0,end:Number.isFinite(v.duration)?Math.min(v.duration,300):10,duration:v.duration,speed:1,caption:'',transition:'default'});v.onerror=()=>resolve(null);v.src=url}})}$('fromGoogle').onclick=()=>startGooglePicker();
+status(items.length?`${items.length} elemento(s) preparados. Puedes previsualizar o crear el vídeo.`:'Añade archivos para comenzar.')}function meta(file,url){return new Promise(resolve=>{if(file.type.startsWith('image/')){const im=new Image();im.onload=()=>resolve({file,url,type:'image',duration:3,media:im,caption:'',transition:'default'});im.onerror=()=>resolve(null);im.src=url}else{const v=document.createElement('video');v.preload='metadata';v.playsInline=true;v.onloadedmetadata=()=>resolve({file,url,type:'video',start:0,end:Number.isFinite(v.duration)?Math.min(v.duration,300):10,duration:v.duration,speed:1,caption:'',transition:'default'});v.onerror=()=>resolve(null);v.src=url}})}$('fromGoogle').onclick=()=>{$('importGuide').innerHTML='<strong>Google Fotos:</strong> abre la app Google Fotos, selecciona fotos o vídeos y usa Compartir → Guardar en el dispositivo / Guardar vídeo (si aparece). Si no está esa opción, utiliza Compartir → Guardar en Archivos. Regresa aquí y pulsa «Elegir fotos o vídeos». <a href="https://photos.google.com/" target="_blank" rel="noopener noreferrer">Abrir Google Fotos en el navegador</a>.';};
 $('fromQuik').onclick=()=>{$('importGuide').innerHTML='<strong>GoPro Quik:</strong> abre Quik, elige tu vídeo o foto y usa Compartir / Exportar → Guardar vídeo o Guardar en Archivos. Vuelve a Mi Vídeo Orlando y pulsa «Elegir fotos o vídeos». Los nombres de los botones pueden variar según la versión de Quik.';};
 $('fromFiles').onclick=()=>{$('importGuide').textContent='Selecciona los archivos que has guardado desde Google Fotos, GoPro Quik o Fotos del iPhone. Espera si iOS está preparando un vídeo grande.';$('media').click();};
 $('media').onchange=async e=>{for(const file of e.target.files){if(!file.type.startsWith('image/')&&!file.type.startsWith('video/'))continue;const url=URL.createObjectURL(file),item=await meta(file,url);if(item)items.push(item);else URL.revokeObjectURL(url)}e.target.value='';mark();update();if(!previewing&&items[0])draw(items[0].media,titleFor(items[0]));};$('music').onchange=e=>{if(musicURL)URL.revokeObjectURL(musicURL);const f=e.target.files[0];if(f&&!(/\.(mp3|m4a|wav|aac|ogg|flac|webm|mp4)$/i.test(f.name)||f.type.startsWith('audio/'))){status('Selecciona un archivo de audio compatible.');return}musicURL=f?URL.createObjectURL(f):null;$('musicPreview').classList.toggle('hidden',!musicURL);if(musicURL){$('musicPreview').src=musicURL;$('musicPreview').volume=Number($('musicVolume').value)/100;status('Música seleccionada: '+f.name)}mark()};$('resetTitle').onclick=()=>{titleScale=1;titleRotation=0;setTitlePosition();redrawTitle()};$('title').oninput=()=>{mark();redrawTitle()};$('format').onchange=()=>{dimensions();draw(null,$('title').value);mark()};dimensions();setTitlePosition();draw(null,'Mi Vídeo Orlando');function totalDuration(){return items.reduce((a,it)=>a+(it.type==='image'?Math.max(1,Math.min(30,+it.duration||3)):Math.max(.1,((+it.end||0)-(+it.start||0))/(Number(it.speed)||1))),0)}
@@ -354,86 +354,4 @@ $('redoEdit').onclick=()=>{if(!redoStack.length)return;undoStack.push(items.map(
 ['titleColor','titleSize','titlePosition','titleFont','titleOutline','transition','transitionDuration','photoMotion','musicVolume','musicFade'].forEach(id=>$(id).addEventListener('input',()=>{mark();if(id==='musicVolume'){$('volumeLabel').textContent=$(id).value+'%';$('musicPreview').volume=Number($(id).value)/100;if(activeAudio)activeAudio.volume=Number($(id).value)/100}if(id==='titlePosition')setTitlePosition();if(!previewing)draw(items[0]?.media||null,titleFor(items[0]||{}));}));
 $('saveDraft').onclick=()=>{try{localStorage.setItem('orlando_video_draft_v2',JSON.stringify({files:items.map(it=>({name:it.file.name,type:it.type,duration:it.duration,start:it.start,end:it.end,caption:it.caption||'',transition:it.transition||'default'})),title:$('title').value,format:$('format').value,color:$('titleColor').value,size:$('titleSize').value,position:$('titlePosition').value,transition:$('transition').value,volume:$('musicVolume').value,fade:$('musicFade').checked,font:$('titleFont').value,outline:$('titleOutline').value,transitionDuration:$('transitionDuration').value,photoMotion:$('photoMotion').value,titleX,titleY,titleScale,titleRotation}));$('draftStatus').textContent='✓ Borrador guardado correctamente · '+new Date().toLocaleString('es-ES')+'. Conserva los archivos originales.'}catch(e){$('draftStatus').textContent='No se pudo guardar: '+e.message}};
 $('loadDraft').onclick=()=>{try{const d=JSON.parse(localStorage.getItem('orlando_video_draft_v2')||'null');if(!d){$('draftStatus').textContent='No hay borrador guardado.';return}for(const [k,v] of Object.entries({title:d.title,format:d.format,titleColor:d.color,titleSize:d.size,titlePosition:d.position,transition:d.transition,musicVolume:d.volume,titleFont:d.font,titleOutline:d.outline,transitionDuration:d.transitionDuration,photoMotion:d.photoMotion}))if($(k)&&v!=null)$(k).value=v;$('musicFade').checked=!!d.fade;if(typeof d.titleX==='number')titleX=d.titleX;if(typeof d.titleY==='number')titleY=d.titleY;if(typeof d.titleScale==='number')titleScale=d.titleScale;if(typeof d.titleRotation==='number')titleRotation=d.titleRotation;$('volumeLabel').textContent=$('musicVolume').value+'%';dimensions();const byName=new Map((d.files||[]).map(f=>[f.name,f]));items.sort((a,b)=>(d.files||[]).findIndex(f=>f.name===a.file.name)-(d.files||[]).findIndex(f=>f.name===b.file.name));for(const it of items){const x=byName.get(it.file.name);if(x)Object.assign(it,{duration:x.duration,start:x.start,end:x.end,caption:x.caption||'',transition:x.transition||'default'})}update();mark();$('draftStatus').textContent='✓ Ajustes del borrador recuperados. Si faltan fotografías o vídeos, vuelve a seleccionarlos desde Archivos o Fotos.'}catch(e){$('draftStatus').textContent='No se pudo recuperar: '+e.message}};
-</script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script>
-/* Google Photos Picker V10.5: access token only in volatile memory. Never persist it. */
-(()=>{
-'use strict';
-const CLIENT_ID='1011571674211-k1ngre61obi8e7ggginffdufujrabp78.apps.googleusercontent.com';
-const SCOPE='https://www.googleapis.com/auth/photospicker.mediaitems.readonly';
-const API='https://photospicker.googleapis.com/v1';
-let token='',session=null,checking=false,aborted=false,tokenClient=null,pollTimer=null;
-const $=id=>document.getElementById(id);
-const msg=t=>{$('importGuide').textContent=t};
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const seconds=s=>Math.max(2000,Math.min(20000,Math.ceil(parseFloat(s)||3)*1000));
-function errorMessage(e){return (e&&e.message)||String(e)}
-function googleToken(){return new Promise((resolve,reject)=>{
- if(!window.google?.accounts?.oauth2){reject(new Error('Google aún no se ha cargado. Comprueba la conexión y vuelve a pulsar.'));return}
- if(!tokenClient)tokenClient=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,callback:()=>{}});
- tokenClient.callback=(res)=>res?.access_token?resolve(res.access_token):reject(new Error(res?.error_description||res?.error||'Autorización cancelada'));
- tokenClient.requestAccessToken({prompt:token?'':'consent'});
- });}
-async function request(path,opts={}){
- const r=await fetch(API+path,{...opts,headers:{Authorization:'Bearer '+token,...(opts.body?{'Content-Type':'application/json'}:{}),...(opts.headers||{})},cache:'no-store'});
- if(!r.ok){let detail='';try{const x=await r.json();detail=x.error?.message||''}catch(_){}throw new Error('Google API '+r.status+(detail?': '+detail:''))}
- return r.status===204?null:r.json();
-}
-async function finish(){
- if(!session||checking)return;
- checking=true;
- try{
- const state=await request('/sessions/'+encodeURIComponent(session.id));
- if(!state.mediaItemsSet){msg('Google Fotos sigue esperando tu selección. Selecciona las imágenes, confirma con Listo y vuelve aquí.');return false}
- msg('Selección confirmada. Preparando los archivos elegidos…');
- let next='',picked=[];
- do{const params=new URLSearchParams({sessionId:session.id,pageSize:'100'});if(next)params.set('pageToken',next);const page=await request('/mediaItems?'+params);picked.push(...(page.mediaItems||[]));next=page.nextPageToken||''}while(next&&!aborted);
- let added=0,failed=0;
- for(let i=0;i<picked.length&&!aborted;i++){
-  const m=picked[i],f=m.mediaFile||{};const mime=m.mimeType||f.mimeType||'';
-  if(!/^image\/|^video\//.test(mime)){failed++;continue}
-  const base=f.baseUrl||m.baseUrl;
-  if(!base){failed++;continue}
-  msg('Importando '+(i+1)+' de '+picked.length+' desde Google Fotos…');
-  try{
-   const suffix=mime.startsWith('video/')?'=dv':'=d';
-   const response=await fetch(base+suffix,{headers:{Authorization:'Bearer '+token},cache:'no-store'});
-   if(!response.ok)throw new Error('Descarga '+response.status);
-   const blob=await response.blob();
-   const filename=(m.filename||f.filename||('Google_Fotos_'+(i+1)+(mime.startsWith('video/')?'.mp4':'.jpg'))).replace(/[\/\\]/g,'_');
-   const file=new File([blob],filename,{type:mime});
-   const url=URL.createObjectURL(file);const item=await meta(file,url);
-   if(item){items.push(item);added++}else{URL.revokeObjectURL(url);failed++}
-  }catch(e){failed++;console.warn('No se pudo incorporar un archivo seleccionado:',errorMessage(e))}
- }
- if(added){mark();update();if(!previewing&&items[0])draw(items[0].media,titleFor(items[0]))}
- msg('Google Fotos: '+added+' archivo(s) añadido(s) al montaje.'+(failed?' '+failed+' no se pudieron importar. En Safari algunas descargas de Google pueden estar restringidas; prueba con Fotos/Archivos si ocurre.':''));
- await cleanup();return true;
- }catch(e){msg('No se pudo completar la importación: '+errorMessage(e));return false}
- finally{checking=false}
-}
-async function cleanup(){clearTimeout(pollTimer);pollTimer=null;const s=session;session=null;$('googleCheck').classList.add('hidden');$('googleCancel').classList.add('hidden');if(s){try{await request('/sessions/'+encodeURIComponent(s.id),{method:'DELETE'})}catch(_){}}token='';}
-async function poll(){if(!session||aborted)return;await finish();if(session&&!aborted)pollTimer=setTimeout(poll,seconds(session.pollingConfig?.pollInterval));}
-window.startGooglePicker=async()=>{
- if(session){msg('Ya tienes una selección abierta. Finalízala o pulsa Cancelar selección.');return}
- aborted=false;
- msg('Solicitando permiso de Google para seleccionar únicamente tus fotos y vídeos…');
- try{
- token=await googleToken();
- msg('Creando selector oficial de Google Fotos…');
- session=await request('/sessions',{method:'POST',body:JSON.stringify({pickingConfig:{maxItemCount:'100'}})});
- if(!session?.pickerUri)throw new Error('Google no ha devuelto el enlace de selección');
- $('googleCheck').classList.remove('hidden');$('googleCancel').classList.remove('hidden');
- const link=document.createElement('a');link.href=session.pickerUri;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Abrir selector de Google Fotos';
- const guide=$('importGuide');guide.textContent='Pulsa el enlace, elige fotos y vídeos en Google y confirma con Listo. Después vuelve aquí; puedes pulsar «Comprobar selección» si tarda en actualizarse. ';
- guide.appendChild(link);
- // iOS Safari can block popups after OAuth: a user-activated link is reliable.
- pollTimer=setTimeout(poll,seconds(session.pollingConfig?.pollInterval));
- }catch(e){msg('No se pudo abrir Google Fotos: '+errorMessage(e));if(session)await cleanup();else token=''}
-};
-$('googleCheck').onclick=()=>finish();
-$('googleCancel').onclick=async()=>{aborted=true;await cleanup();msg('Selección cancelada. No se han añadido nuevas fotografías.');};
-})();
-</script>
-</body></html>
+</script></body></html>
