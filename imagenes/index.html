@@ -121,7 +121,7 @@ footer{text-align:center;font-size:12px;color:#778498}
 const $=id=>document.getElementById(id);
 let imageBatchFiles=[],protectFiles=[],current="",parentSection="home",outputs=[],audioState=null,previewToken=0,scanPages=[],pdfViewItems=[],pdfViewIndex=0,pdfViewZoom=1,pdfViewDoc=null,organizedOrder=[],mergeOrder=[],signatureReady=false,ocrText="";
 const settings={
-images:["Convertir imágenes","Convierte HEIC/HEIF, JPG o PNG a JPG o PNG.","image/*,.heic,.heif",'<label for="format">Formato de salida</label><select id="format"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select>'],
+images:["Convertir imágenes","V10.9 · Convierte HEIC/HEIF, JPG o PNG a JPG o PNG.","image/*,.heic,.heif",'<label for="format">Formato de salida</label><select id="format"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select>'],
 imagepdf:["Imágenes a PDF","Selecciona fotografías para crear un PDF.","image/*,.heic,.heif",""],
 merge:["Unir PDF","Selecciona dos o más PDF en el orden deseado.","application/pdf,.pdf",""],
 split:["Dividir PDF","Extrae páginas; por ejemplo: 1-3,5.","application/pdf,.pdf",'<label for="pages">Páginas a extraer</label><input id="pages" placeholder="1-3,5">'],
@@ -201,7 +201,32 @@ document.querySelectorAll("[data-editor-action]").forEach(tile=>tile.addEventLis
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>navigate(b.dataset.back));
 $("back").onclick=()=>navigate(parentSection);
 $("search").oninput=e=>{const q=e.target.value.toLocaleLowerCase();document.querySelectorAll("#homeTiles .tile").forEach(t=>t.classList.toggle("hidden",!t.innerText.toLocaleLowerCase().includes(q)))};
-async function imageBlob(f){if(/heic|heif/i.test(f.type)||/\.(heic|heif)$/i.test(f.name)){await load("heic","heic2any");const b=await heic2any({blob:f,toType:"image/jpeg"});return Array.isArray(b)?b[0]:b}return f}
+async function imageBlob(f){
+// Safari puede entregar JPEG aunque el nombre del archivo siga terminando en .HEIC.
+// Identificamos el contenido real antes de usar el conversor HEIC.
+const bytes=new Uint8Array(await f.slice(0,32).arrayBuffer());
+const ascii=(start,length)=>String.fromCharCode(...bytes.slice(start,start+length));
+const jpeg=bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff;
+const png=bytes.length>=8&&bytes[0]===0x89&&ascii(1,3)==="PNG";
+const webp=ascii(0,4)==="RIFF"&&ascii(8,4)==="WEBP";
+const gif=ascii(0,3)==="GIF";
+const brand=ascii(8,4).toLowerCase();
+const heic=ascii(4,4)==="ftyp"&&/^(heic|heix|hevc|hevx|heim|heis|mif1|msf1)$/.test(brand);
+if(jpeg||png||webp||gif)return f;
+if(heic){
+// Safari puede leer HEIC de forma nativa: probamos primero sin conversión externa.
+try{const bitmap=await createImageBitmap(f);bitmap.close?.();return f}catch(_){/* usar conversor */}
+await load("heic","heic2any");
+const b=await heic2any({blob:f,toType:"image/jpeg"});return Array.isArray(b)?b[0]:b;
+}
+// Para formatos que el navegador ya lee, no convertir basándose solo en la extensión.
+try{const bitmap=await createImageBitmap(f);bitmap.close?.();return f}catch(_){
+if(/heic|heif/i.test(f.type)||/\.(heic|heif)$/i.test(f.name)){
+await load("heic","heic2any");const b=await heic2any({blob:f,toType:"image/jpeg"});return Array.isArray(b)?b[0]:b;
+}
+throw Error("Formato de imagen no compatible con este navegador");
+}
+}
 async function imageCanvas(f){const b=await imageBlob(f),bitmap=await createImageBitmap(b),c=document.createElement("canvas");c.width=bitmap.width;c.height=bitmap.height;c.getContext("2d").drawImage(bitmap,0,0);bitmap.close?.();return c}
 function canvasBlob(c,type){return new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(Error("No se pudo convertir la imagen")),type,.92))}
 function range(spec,total){let ids=[];for(const part of spec.split(",")){const m=part.trim().match(/^(\d+)(?:-(\d+))?$/);if(!m)throw Error("Escribe páginas como 1-3,5");const a=+m[1],b=m[2]?+m[2]:a;if(a<1||b<a||b>total)throw Error("Página fuera de rango");for(let i=a;i<=b;i++)ids.push(i-1)}return ids}
