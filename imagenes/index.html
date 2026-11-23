@@ -68,7 +68,7 @@ footer{text-align:center;font-size:12px;color:#778498}
 .v88fieldRow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid #d8e1eb}
 .v88fieldRow span{flex:1 1 120px;font-size:13px}.v88fieldRow button{font-size:12px;padding:7px;border:1px solid #d5dfec;border-radius:8px;background:#f2f6fb}
 #v83viewport.nav-mode .v88field,#v83viewport.ink-mode .v88field{pointer-events:none!important}
-.image-batch-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #dce4ef;padding:8px 0;overflow-wrap:anywhere}.image-batch-row span{min-width:0;flex:1;font-size:14px}.image-batch-row button{flex-shrink:0;font-size:13px;padding:8px 10px}#imageBatchCount{font-weight:700;color:#263d62}#imageBatchUI{margin:12px 0;padding:12px;border:1px solid #dbe3ee;border-radius:12px;background:#f6f9fd}#imageBatchUI .buttons{display:flex;flex-wrap:wrap;gap:8px}#imageBatchUI .buttons button{flex:1 1 160px}#files{max-width:100%;min-width:0;box-sizing:border-box} </style></head>
+.image-batch-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #dce4ef;padding:8px 0;overflow-wrap:anywhere}.image-batch-row span{min-width:0;flex:1;font-size:14px}.image-batch-row button{flex-shrink:0;font-size:13px;padding:8px 10px}#imageBatchCount{font-weight:700;color:#263d62}#imageBatchUI{margin:12px 0;padding:12px;border:1px solid #dbe3ee;border-radius:12px;background:#f6f9fd}#imageBatchUI .buttons{display:flex;flex-wrap:wrap;gap:8px}#imageBatchUI .buttons button{flex:1 1 160px}#files{max-width:100%;min-width:0;box-sizing:border-box} </style><style id="imageBulkStyles">.image-result-select{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:650;margin-bottom:12px}.image-result-select input{width:22px;height:22px;flex:none}#imageBulkBar{border:2px solid #c9d7ee;background:#f1f6ff}#imageBulkBar .buttons{display:flex;flex-wrap:wrap;gap:8px}#imageBulkBar button{flex:1 1 220px;white-space:normal;min-height:48px}@media(max-width:600px){#imageBulkBar{padding:14px}#imageBulkBar button{font-size:15px}}</style></head>
 <body><nav id="orlando-home-nav" style="position:sticky;top:0;z-index:99999;background:#f5f8ff;border-bottom:1px solid #d7e0ed;padding:calc(9px + env(safe-area-inset-top, 0px)) 12px 9px;text-align:left;font:600 14px system-ui,sans-serif"><a href="../index.html" onclick="return orlandoConfirmBack(event)" style="color:#145ba2;text-decoration:none;display:inline-block;padding:8px 10px;border-radius:9px;background:#e5efff">← Volver a Mi Oficina</a></nav><script>function orlandoConfirmBack(e){const files=[...document.querySelectorAll('input[type=file]')].some(x=>x.files&&x.files.length);if(files&&!confirm('¿Volver a Mi Oficina? Los cambios no guardados pueden perderse.')){e.preventDefault();return false}return true}</script><header class="brand-header"><img class="brand-img" src="logo-orlando.png" alt="Mi Oficina Orlando · Edición 2026"><h2 class="v8headline">HERRAMIENTAS PARA TU IPHONE</h2></header>
 <main>
 <section id="home"><p><a href="../index.html" style="color:#155fa8;font-weight:700;text-decoration:none">← Mi Oficina Orlando</a></p><input id="search" class="hidden" aria-label="Buscar herramienta">
@@ -157,7 +157,7 @@ function load(key,global){if(window[global])return Promise.resolve();return new 
 function base(n){return n.replace(/\.[^.]+$/,"")}
 function cleanupAudio(){if(!audioState)return;audioState.sound.pause();URL.revokeObjectURL(audioState.url);audioState.ctx.close().catch(()=>{});audioState=null}
 function navigate(section){closeViewer();previewToken++;cleanupAudio();for(let id of ["home","pdfmenu","workspace"])$(id).classList.toggle("hidden",id!==section);window.scrollTo(0,0)}
-function showTool(id){imageBatchFiles=[];protectFiles=[];scanPages=[];organizedOrder=[];mergeOrder=[];current=id;parentSection=["images","audio","zip","scan"].includes(id)?"home":"pdfmenu";navigate("workspace");const s=settings[id];$("toolTitle").textContent=s[0];$("toolHelp").textContent=s[1];$("files").value="";$("files").accept=s[2];$("files").multiple=["images","imagepdf","merge","zip","scan","compare","protect"].includes(id);$("imageBatchUI").classList.toggle("hidden",id!=="images");$("imageBatchList").replaceChildren();$("imageBatchCount").textContent="Ninguna fotografía añadida";$("extra").innerHTML=s[3];if(id==="protect"){const section=document.createElement("div");section.innerHTML='<p class="hint">Puedes seleccionar varios PDF y añadir otros después. Todos se protegerán con la misma contraseña y se descargarán por separado.</p><button type="button" class="action secondary" id="protectAddMore">＋ Añadir más PDF</button><div id="protectFileList" aria-live="polite"></div>'; $("extra").prepend(section);$("protectAddMore").onclick=()=>$("files").click();} $("status").textContent="";$("results").replaceChildren();if(id==="sign")setupSignature();$("run").disabled=false}
+function showTool(id){imageBatchFiles=[];protectFiles=[];scanPages=[];organizedOrder=[];mergeOrder=[];current=id;parentSection=["images","audio","zip","scan"].includes(id)?"home":"pdfmenu";navigate("workspace");const s=settings[id];$("toolTitle").textContent=s[0];$("toolHelp").textContent=s[1];$("files").value="";$("files").accept=s[2];$("files").multiple=["images","imagepdf","merge","zip","scan","compare","protect"].includes(id);$("imageBatchUI").classList.toggle("hidden",id!=="images");$("imageBatchList").replaceChildren();$("imageBatchCount").textContent="Ninguna fotografía añadida";$("extra").innerHTML=s[3];if(id==="protect"){const section=document.createElement("div");section.innerHTML='<p class="hint">Puedes seleccionar varios PDF y añadir otros después. Todos se protegerán con la misma contraseña y se descargarán por separado.</p><button type="button" class="action secondary" id="protectAddMore">＋ Añadir más PDF</button><div id="protectFileList" aria-live="polite"></div>'; $("extra").prepend(section);$("protectAddMore").onclick=()=>$("files").click();} $("status").textContent="";$("results").replaceChildren();imageOutputs.length=0;imageBulkUI();if(id==="sign")setupSignature();$("run").disabled=false}
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>b.dataset.go==="pdfmenu"?navigate("pdfmenu"):showTool(b.dataset.go));
 // V10: catálogo accesible también desde la portada del editor, antes de cargar archivos.
 const editorCatalog=document.getElementById("v10editorToolCatalog");
@@ -231,10 +231,57 @@ async function imageCanvas(f){const b=await imageBlob(f),bitmap=await createImag
 function canvasBlob(c,type){return new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(Error("No se pudo convertir la imagen")),type,.92))}
 function range(spec,total){let ids=[];for(const part of spec.split(",")){const m=part.trim().match(/^(\d+)(?:-(\d+))?$/);if(!m)throw Error("Escribe páginas como 1-3,5");const a=+m[1],b=m[2]?+m[2]:a;if(a<1||b<a||b>total)throw Error("Página fuera de rango");for(let i=a;i<=b;i++)ids.push(i-1)}return ids}
 function filenameSafe(s){return s.replace(/[\\/:*?"<>|]/g,"_").trim()}
+const imageOutputs=[];
+function imageOutputName(entry){
+ let n=filenameSafe(entry.input.value)||entry.defaultName;
+ const ext=entry.defaultName.match(/\.[^.]+$/)?.[0]||"";
+ if(ext&&!n.toLowerCase().endsWith(ext.toLowerCase()))n+=ext;
+ return n;
+}
+function imageBulkUI(){
+ const bar=$("imageBulkBar");if(!bar)return;
+ bar.classList.toggle("hidden",current!=="images"||!imageOutputs.length);
+ const chosen=imageOutputs.filter(e=>e.check.checked);
+ $("imageBulkCount").textContent=`${imageOutputs.length} imágenes listas · ${chosen.length} seleccionadas`;
+}
+function imageBulkEntries(){return imageOutputs.filter(e=>e.check.checked)}
+function imageBulkInit(){
+ if($("imageBulkBar"))return;
+ const bar=document.createElement("div");bar.id="imageBulkBar";bar.className="result hidden";
+ bar.innerHTML='<h3>📦 Guardar o compartir varias imágenes</h3><p id="imageBulkCount" class="hint"></p><div class="buttons"><button type="button" class="action secondary" id="imageBulkAll">Seleccionar todas</button><button type="button" class="action secondary" id="imageBulkNone">Deseleccionar</button></div><div class="buttons"><button type="button" class="action" id="imageBulkShare">↗ Compartir seleccionadas</button><button type="button" class="action secondary" id="imageBulkZip">📦 Guardar seleccionadas en ZIP</button></div><p class="hint">El iPhone puede limitar el número de imágenes que acepta al compartir. Si sucede, utiliza ZIP. Ningún archivo se guarda automáticamente.</p>';
+ $("results").parentNode.insertBefore(bar,$("results"));
+ $("imageBulkAll").onclick=()=>{imageOutputs.forEach(e=>e.check.checked=true);imageBulkUI()};
+ $("imageBulkNone").onclick=()=>{imageOutputs.forEach(e=>e.check.checked=false);imageBulkUI()};
+ $("imageBulkShare").onclick=async()=>{
+  const chosen=imageBulkEntries();if(!chosen.length){$("status").textContent="Selecciona alguna imagen.";return}
+  const btn=$("imageBulkShare");btn.disabled=true;btn.textContent="Preparando imágenes…";
+  try{
+   const files=chosen.map(e=>new File([e.blob],imageOutputName(e),{type:e.blob.type||"image/jpeg"}));
+   if(!navigator.canShare?.({files}))throw Error("Safari no admite compartir este lote de imágenes. Prueba con menos fotografías o utiliza Guardar seleccionadas en ZIP.");
+   await navigator.share({files,title:`${files.length} fotografías convertidas`});
+  }catch(e){if(e.name!=="AbortError")$("status").textContent=e.message||"No se pudo compartir el lote."}
+  finally{btn.disabled=false;btn.textContent="↗ Compartir seleccionadas"}
+ };
+ $("imageBulkZip").onclick=async()=>{
+  const chosen=imageBulkEntries();if(!chosen.length){$("status").textContent="Selecciona alguna imagen.";return}
+  const btn=$("imageBulkZip");btn.disabled=true;btn.textContent="Preparando ZIP…";
+  try{
+   await load("zip","JSZip");const zip=new JSZip();const used=new Set();
+   for(const e of chosen){let n=imageOutputName(e),candidate=n,k=2;while(used.has(candidate.toLowerCase())){const dot=n.lastIndexOf(".");candidate=dot>=0?n.slice(0,dot)+"_"+k+n.slice(dot):n+"_"+k;k++}used.add(candidate.toLowerCase());zip.file(candidate,e.blob)}
+   const blob=await zip.generateAsync({type:"blob",compression:"DEFLATE",compressionOptions:{level:3}});
+   saveResult(blob,"Fotografias_convertidas_"+chosen.length+".zip");
+   $("status").textContent="ZIP preparado. Revisa el resultado y elige dónde guardarlo.";
+  }catch(e){$("status").textContent="No se pudo preparar el ZIP: "+e.message}
+  finally{btn.disabled=false;btn.textContent="📦 Guardar seleccionadas en ZIP"}
+ };
+}
 function saveResult(blob,defaultName){
 const box=document.createElement("div");box.className="result";
 const label=document.createElement("label");label.textContent="Nombre del archivo";
 const name=document.createElement("input");name.value=defaultName;name.setAttribute("aria-label","Nombre del archivo");
+const isImage=current==="images"&&blob.type.startsWith("image/");
+let entry=null;
+if(isImage){imageBulkInit();const pick=document.createElement("label");pick.className="image-result-select";const check=document.createElement("input");check.type="checkbox";check.checked=true;pick.append(check,document.createTextNode(" Incluir al compartir o guardar en lote"));box.append(pick);entry={blob,input:name,defaultName,check};imageOutputs.push(entry);check.onchange=imageBulkUI;imageBulkUI()}
 const note=document.createElement("p");note.className="hint";note.textContent="Para elegir una carpeta del iPhone, pulsa «Elegir dónde guardar», después «Guardar en Archivos».";
 const actions=document.createElement("div");actions.className="buttons";
 const download=document.createElement("button");download.className="action";download.textContent="⬇ Descargar";
@@ -242,11 +289,12 @@ const share=document.createElement("button");share.className="action secondary";
 const finalName=()=>{let n=filenameSafe(name.value)||defaultName;const ext=defaultName.match(/\.[^.]+$/)?.[0]||"";if(ext&&!n.toLowerCase().endsWith(ext.toLowerCase()))n+=ext;return n};
 download.onclick=()=>{const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=finalName();document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)};
 share.onclick=async()=>{try{const n=finalName(),f=new File([blob],n,{type:blob.type||"application/octet-stream"});if(navigator.canShare?.({files:[f]}))await navigator.share({files:[f],title:n});else throw Error("El menú de compartir archivos no está disponible en este navegador. Usa Descargar y después «Compartir» desde Archivos.")}catch(e){if(e.name!=="AbortError")$("status").textContent=e.message}};
-const remove=document.createElement("button");remove.className="action secondary";remove.textContent="🗑 Eliminar resultado";remove.onclick=()=>{if(confirm("¿Eliminar este resultado de la aplicación? No se borrarán las copias ya guardadas en Archivos o iCloud."))box.remove()};actions.append(download,share,remove);box.append(label,name,note,actions);$("results").append(box)
+const remove=document.createElement("button");remove.className="action secondary";remove.textContent="🗑 Eliminar resultado";remove.onclick=()=>{if(confirm("¿Eliminar este resultado de la aplicación? No se borrarán las copias ya guardadas en Archivos o iCloud.")){if(entry){const i=imageOutputs.indexOf(entry);if(i>=0)imageOutputs.splice(i,1);imageBulkUI()}box.remove()}};actions.append(download,share,remove);box.append(label,name,note,actions);$("results").append(box)
 }
+
 function wav(buffer,start,end){const rate=buffer.sampleRate,from=Math.floor(start*rate),to=Math.min(buffer.length,Math.floor(end*rate)),n=to-from,channels=Math.min(2,buffer.numberOfChannels),bytes=44+n*channels*2,ab=new ArrayBuffer(bytes),v=new DataView(ab);let p=0;function str(s){for(let i=0;i<s.length;i++)v.setUint8(p++,s.charCodeAt(i))}function u16(x){v.setUint16(p,x,true);p+=2}function u32(x){v.setUint32(p,x,true);p+=4}str("RIFF");u32(bytes-8);str("WAVEfmt ");u32(16);u16(1);u16(channels);u32(rate);u32(rate*channels*2);u16(channels*2);u16(16);str("data");u32(n*channels*2);for(let i=from;i<to;i++)for(let ch=0;ch<channels;ch++){const x=Math.max(-1,Math.min(1,buffer.getChannelData(ch)[i]));v.setInt16(p,x<0?x*32768:x*32767,true);p+=2}return new Blob([ab],{type:"audio/wav"})}
 async function pdfDoc(file){return PDFLib.PDFDocument.load(await file.arrayBuffer())}
-$("run").onclick=async()=>{const files=current==="images"?imageBatchFiles:(current==="protect"?protectFiles:[...$("files").files]);if(!files.length){$("status").textContent="Selecciona al menos un archivo.";return}const btn=$("run");btn.disabled=true;$("status").textContent="Procesando…";$("results").replaceChildren();
+$("run").onclick=async()=>{const files=current==="images"?imageBatchFiles:(current==="protect"?protectFiles:[...$("files").files]);if(!files.length){$("status").textContent="Selecciona al menos un archivo.";return}const btn=$("run");btn.disabled=true;$("status").textContent="Procesando…";$("results").replaceChildren();imageOutputs.length=0;imageBulkUI();
 try{
 if(current==="protect"){let done=0;const errors=[];const password=$("protectPassword").value,confirm=$("protectConfirm").value;for(const file of files){try{await window.orlandoProtectPdf(file,password,confirm);done++}catch(e){errors.push(file.name+": "+e.message)}}$("status").textContent=done+" de "+files.length+" PDF protegidos."+(errors.length?" Errores: "+errors.join(" | "):"");if(!done)throw Error(errors.join(" | "));}
 if(current==="scan"){await load("pdf","PDFLib");if(!scanPages.length)throw Error("Selecciona una o varias fotografías");const pdf=await PDFLib.PDFDocument.create();for(const item of scanPages){const c=renderScanned(item,Number($("scanQuality").value),$("scanMode").value),blob=await canvasBlob(c,"image/jpeg"),im=await pdf.embedJpg(await blob.arrayBuffer()),page=pdf.addPage([595.28,841.89]);const k=Math.min(595.28/im.width,841.89/im.height);page.drawImage(im,{x:(595.28-im.width*k)/2,y:(841.89-im.height*k)/2,width:im.width*k,height:im.height*k})}saveResult(new Blob([await pdf.save()],{type:"application/pdf"}),"documento_escaneado.pdf")}
